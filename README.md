@@ -1,5 +1,7 @@
 # Resque::Plugins::SerialQueues
 
+This gem is tested on the latest version from Resque 1.x.
+
 Declaring resque queues as serial. Jobs from a serial queue won't be processed more than one at a time event if you have multiple workers / servers. There are similar solutions but none of them worked for me. To lock jobs from running in parallel I used `Redis#setnx`. This implementation has 2 sensitive things:
 - `Resque::Job.reserve` is overriden (here the queue locking is done)
 - Added `Object#after_perform_unlock_serial_queue` (here the queue is unlocked)
