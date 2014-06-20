@@ -28,19 +28,19 @@ class ResqueSerialQueuesTest < Minitest::Test
   end
 
   def assert_queue_locked(queue)
-    Resque::Plugins::SerialQueues.is_queue_locked?(queue)
+    assert Resque::Plugins::SerialQueues.is_queue_locked?(queue), "Queue #{queue} should be locked but it's unlocked"
   end
 
   def assert_queue_unlocked(queue)
-    !Resque::Plugins::SerialQueues.is_queue_locked?(queue)
+    assert !Resque::Plugins::SerialQueues.is_queue_locked?(queue), "Queue #{queue} should be unlocked but it's locked"
   end
 
   def assert_serial_queue(queue)
-    Resque::Plugins::SerialQueues.is_queue_serial?(queue)
+    assert Resque::Plugins::SerialQueues.is_queue_serial?(queue), "Queue #{queue} should be serial but it's concurrent"
   end
 
   def assert_concurrent_queue(queue)
-    !assert_serial_queue(queue)
+    assert !Resque::Plugins::SerialQueues.is_queue_serial?(queue), "Queue #{queue} should be concurrent but it's serial"
   end
 
   def log(message)

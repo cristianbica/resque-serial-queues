@@ -14,7 +14,7 @@ class LockingTest < ResqueSerialQueuesTest
   end
 
   def test_locking_a_queue
-    assert Resque::Plugins::SerialQueues.lock_queue(:serial_jobs)
+    assert Resque::Plugins::SerialQueues.lock_queue(:serial_jobs), "Should be able to lock a queue but couldn't"
     assert_queue_locked :serial_jobs
   end
 
@@ -51,9 +51,9 @@ class LockingTest < ResqueSerialQueuesTest
   end
 
   def test_running_many_concurrent_jobs
-    jobs = 1000
+    jobs = 10
     max_sleep = 0.05
-    workers = 20
+    workers = 2
     self.class.start_redis_workers workers
     jobs.times do
       Resque.enqueue BenchmarkJob, max_sleep
@@ -61,7 +61,7 @@ class LockingTest < ResqueSerialQueuesTest
     assert_queue_locked :serial_jobs
     while Resque.info[:pending]>0
       sleep 0.1
-      assert Resque.info[:working]<=1
+      assert Resque.info[:working]<=1, "Should not have more than one working worker"
     end
     assert_queue_unlocked :serial_jobs
     results = []
