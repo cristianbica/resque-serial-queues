@@ -70,14 +70,23 @@ class ResqueSerialQueuesTest < Minitest::Test
           raise "Failed to start worker"
         end
       else
-        Resque.redis.client.reconnect
-        worker = Resque::Worker.new("*")
-        worker.term_timeout = 4.0
-        worker.term_child = true
-        Resque.logger.level = Logger::DEBUG
-        log "Worker started working"
-        worker.work 0.1
-        Kernel.exit!
+        begin
+          Resque.redis.client.reconnect
+          # we need to prevent against querying for jobs in "*"
+          Resque.watch_queue :test_queue
+          # Resque.logger = MonoLogger.new(File.open(File.expand_path('../../log', __FILE__) << "/resque-#{Process.pid}.log", "w+"))
+          # Resque.logger.level = Logger::DEBUG
+          # Resque.logger.formatter = Resque::VerboseFormatter.new
+          worker = Resque::Worker.new("*")
+          worker.term_timeout = 4.0
+          worker.term_child = true
+          log "Worker will start working"
+          worker.work 0.1
+          Kernel.exit!
+        rescue Exception => e
+          log "Failed to start worker: #{e.inspect}"
+          Kernel.exit!
+        end
       end
     end
 

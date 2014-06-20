@@ -17,6 +17,10 @@ module Resque
         config.serial_queues.include?(queue.to_s)
       end
 
+      def self.is_queue_locked?(queue)
+        redis.exists("queue-lock:#{queue}")
+      end
+
       def self.lock_queue(queue)
         if redis.setnx("queue-lock:#{queue}", 1)
           redis.expire("queue-lock:#{queue}", config.lock_timeout)
@@ -24,10 +28,6 @@ module Resque
         else
           false
         end
-      end
-
-      def self.is_queue_locked?(queue)
-        redis.exists("queue-lock:#{queue}")
       end
 
       def self.unlock_queue(queue)

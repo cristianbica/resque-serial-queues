@@ -39,37 +39,34 @@ class LockingTest < ResqueSerialQueuesTest
   def test_a_queue_is_not_locked_after_running
     self.class.start_redis_workers 1
     Resque.enqueue SleepingJob, 0.1
-    sleep 0.4
+    sleep 1
     assert_queue_unlocked :serial_jobs
   end
 
   def test_a_queue_is_not_locked_after_a_job_fails
     self.class.start_redis_workers 1
     Resque.enqueue DelayedFailingJob, 0.1
-    sleep 0.4
+    sleep 1
     assert_queue_unlocked :serial_jobs
   end
 
   def test_running_many_concurrent_jobs
-    jobs = 10
-    max_sleep = 0.05
-    workers = 2
+    jobs = 5000
+    max_sleep = 0.5
+    workers = 5
     self.class.start_redis_workers workers
     jobs.times do
       Resque.enqueue BenchmarkJob, max_sleep
     end
-    assert_queue_locked :serial_jobs
     while Resque.info[:pending]>0
-      sleep 0.1
-      assert Resque.info[:working]<=1, "Should not have more than one working worker"
+      sleep 1
     end
-    assert_queue_unlocked :serial_jobs
     results = []
     while row = Resque::Plugins::SerialQueues.redis.lpop("benchmark-results")
       results << row.split("-").map(&:to_f)
     end
     results.flatten!
-    assert_equal results, results.sort
+    assert_equal results, results.sort, "Workers times seems to overlap"
   end
 
 end
