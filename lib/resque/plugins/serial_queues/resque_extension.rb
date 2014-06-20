@@ -19,7 +19,7 @@ class Resque::Job
 end
 
 class Object
-  def self.after_perform_unlock_queue(*)
-    Resque::Plugins::SerialQueues.unlock_queue(@queue)
+  def self.after_perform_unlock_serial_queue(*)
+    Resque::Plugins::SerialQueues.unlock_queue(@queue) if Resque::Plugins::SerialQueues.is_queue_serial?(@queue)
   end
 end
