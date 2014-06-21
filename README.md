@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/cristianbica/resque-serial-queues.svg?branch=master)](https://travis-ci.org/cristianbica/resque-serial-queues)
+[![Gem Version](https://badge.fury.io/rb/resque-serial-queues.svg)](http://badge.fury.io/rb/resque-serial-queues)
+
 # Resque::Plugins::SerialQueues
 
 This gem is tested on the latest version from Resque 1.x.
