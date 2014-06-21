@@ -14,6 +14,10 @@ Resque.redis = "127.0.0.1:6379:10/resque-serial-queues:resque"
 
 $redis_workers_pids = []
 
+trap("INT")  { ResqueSerialQueuesTest.stop_redis_workers(true); exit! }
+trap("TERM") { ResqueSerialQueuesTest.stop_redis_workers(true); exit! }
+trap("QUIT") { ResqueSerialQueuesTest.stop_redis_workers(true); exit! }
+
 class ResqueSerialQueuesTest < Minitest::Test
 
   #alias_method :run_without_resque_serial_queue_hooks, :run
@@ -114,11 +118,11 @@ class ResqueSerialQueuesTest < Minitest::Test
       Resque::Worker.all.map(&:to_s).grep(/\:#{pid}\:/).any?
     end
 
-    def self.stop_redis_workers
+    def self.stop_redis_workers(forced=false)
       while pid = $redis_workers_pids.pop do
         log "Stopping worker with pid #{pid} (QUIT)"
         Process.kill "QUIT", pid
-        log "Stopping worker with pid #{pid} (TERM)" and Process.kill "TERM", pid unless wait_for_worker_to_finish(pid)
+        log "Stopping worker with pid #{pid} (TERM)" and Process.kill "TERM", pid if forced or not wait_for_worker_to_finish(pid)
         log "Stopped worker with pid #{pid}"
         Process.kill 9, pid rescue nil
       end

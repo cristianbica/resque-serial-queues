@@ -51,9 +51,11 @@ class LockingTest < ResqueSerialQueuesTest
   end
 
   def test_running_many_concurrent_jobs
-    jobs = 5000
-    max_sleep = 0.5
-    workers = 5
+    aggressive = (ENV["AGGRESSIVE"]=="1")
+    jobs = aggressive ? 5000 : 100
+    max_sleep = aggressive ? 0.1 : 0.5
+    workers = aggressive ? 20 : 2
+    log "Running #{jobs} jobs (max time per job is #{max_sleep}s) through #{workers} workers"
     self.class.start_redis_workers workers
     jobs.times do
       Resque.enqueue BenchmarkJob, max_sleep
