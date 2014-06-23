@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/cristianbica/resque-serial-queues.svg?branch=master)](https://travis-ci.org/cristianbica/resque-serial-queues)
 [![Gem Version](https://badge.fury.io/rb/resque-serial-queues.svg)](http://badge.fury.io/rb/resque-serial-queues)
+[![Code Climate](https://codeclimate.com/github/cristianbica/resque-serial-queues.png)](https://codeclimate.com/github/cristianbica/resque-serial-queues)
 
 # Resque::Plugins::SerialQueues
 
